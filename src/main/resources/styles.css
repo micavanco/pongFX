@@ -1,0 +1,27 @@
+#root {
+    -fx-background-image: url("frosted-glass.jpg");
+    -fx-background-size: stretch;
+}
+
+#slab {
+    -fx-fill: #22976d;
+    -fx-smooth: true;
+    -fx-stroke: #000000;
+    -fx-stroke-width: 2;
+    -fx-stroke-type: outside;
+}
+
+#ball {
+    -fx-fill: #ffffff;
+    -fx-smooth: true;
+    -fx-stroke: #000000;
+    -fx-stroke-width: 2;
+    -fx-stroke-type: outside;
+}
+
+#brick {
+    -fx-fill: #bf5000;
+    -fx-stroke: #9c3f03;
+    -fx-stroke-width: 2;
+    -fx-stroke-type: inside;
+}
