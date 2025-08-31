@@ -1,6 +1,7 @@
 package com.michaelolech.pongfx;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
@@ -10,12 +11,18 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class PongFXApplication extends Application {
-    private final int WINDOW_WIDTH = 1080;
+    private final int WINDOW_WIDTH = 1070;
     private final int WINDOW_HEIGHT = 640;
     private final int BRICKS_LEVELS = 3;
     private final int BRICK_WIDTH = 120;
     private final int BRICK_HEIGHT = 20;
     private final int BRICKS_PADDING = (int) (WINDOW_WIDTH * 0.1);
+    private final int BALL_RADIUS = 10;
+    private final int RACKET_WIDTH = 100;
+    private Circle ball;
+    private Rectangle racket;
+    private boolean isGameRunning = false;
+    private Thread gameThread;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -25,6 +32,10 @@ public class PongFXApplication extends Application {
         stage.setScene(scene);
 
         stage.show();
+        stage.setResizable(false);
+        stage.centerOnScreen();
+
+        addMainWindowEventListener(scene);
     }
 
     public static void main(String[] args) {
@@ -55,9 +66,9 @@ public class PongFXApplication extends Application {
     }
 
     private void createBall(Pane root) {
-        Circle ball = new Circle();
+        this.ball = new Circle();
 
-        ball.setRadius(5);
+        ball.setRadius(BALL_RADIUS);
         ball.setId("ball");
         ball.setCenterX((double) WINDOW_WIDTH / 2);
         ball.setCenterY((double) WINDOW_HEIGHT / 2);
@@ -66,15 +77,15 @@ public class PongFXApplication extends Application {
     }
 
     private void createRacket(Pane root) {
-        Rectangle slab = new Rectangle();
+        this.racket = new Rectangle();
 
-        slab.setId("slab");
-        slab.setWidth(100);
-        slab.setHeight(5);
-        slab.setX((double) WINDOW_WIDTH / 2 - slab.getWidth() / 2);
-        slab.setY(WINDOW_HEIGHT - 20);
+        racket.setId("racket");
+        racket.setWidth(RACKET_WIDTH);
+        racket.setHeight(10);
+        racket.setX((double) WINDOW_WIDTH / 2 - racket.getWidth() / 2);
+        racket.setY(WINDOW_HEIGHT - 20);
 
-        root.getChildren().add(slab);
+        root.getChildren().add(racket);
     }
 
     private void createBricks(Pane root) {
@@ -106,5 +117,22 @@ public class PongFXApplication extends Application {
         brick.setY(posY);
 
         return brick;
+    }
+
+    private void addMainWindowEventListener(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case LEFT -> {
+                    if (racket.getX() > 0) {
+                        racket.setX(racket.getX() - 17);
+                    }
+                }
+                case RIGHT -> {
+                    if (racket.getX() < WINDOW_WIDTH - RACKET_WIDTH) {
+                        racket.setX(racket.getX() + 17);
+                    }
+                }
+            }
+        });
     }
 }
