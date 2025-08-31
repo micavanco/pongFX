@@ -1,11 +1,12 @@
 package com.michaelolech.pongfx;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -31,8 +32,11 @@ public class PongFXApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        Pane root = createGame();
-        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        Pane game = createGame();
+        Pane mainManu = createMainMenu();
+
+        Scene scene = new Scene(mainManu, WINDOW_WIDTH, WINDOW_HEIGHT);
+        scene.getStylesheets().add("styles.css");
         stage.setTitle("PongFX");
         stage.setScene(scene);
 
@@ -44,26 +48,50 @@ public class PongFXApplication extends Application {
         });
 
         addMainWindowEventListener(scene);
-        startGame();
+//        startGame();
     }
 
     public static void main(String[] args) {
         launch();
     }
 
+    private Pane createMainMenu() {
+        double centerX = (double) WINDOW_WIDTH / 2;
+        double centerY = (double) WINDOW_HEIGHT / 2;
+        Pane root = new Pane();
+        root.setId("menu");
+
+        Text title = new Text("PongFX Main Menu");
+        title.setId("menu-title");
+        title.setX(centerX - 230);
+        title.setY(centerY - 120);
+
+        Button startGame = new Button("Start Game");
+        startGame.setId("menu-button");
+        startGame.setMinWidth(240);
+        startGame.setMaxWidth(240);
+        startGame.setLayoutX(centerX - 120);
+        startGame.setLayoutY(centerY);
+        startGame.setOnAction(event -> {
+
+        });
+
+        root.getChildren().addAll(title, startGame);
+
+        return root;
+    }
+
     private Pane createGame() {
-        Pane root = createWindow();
+        Pane root = createGameWindow();
 
         createElements(root);
 
         return root;
     }
 
-    private Pane createWindow() {
+    private Pane createGameWindow() {
         Pane root = new Pane();
-        root.setId("root");
-
-        root.getStylesheets().add("styles.css");
+        root.setId("game");
 
         return root;
     }
@@ -133,12 +161,12 @@ public class PongFXApplication extends Application {
             switch (event.getCode()) {
                 case LEFT -> {
                     if (racket.getX() > 0) {
-                        racket.setX(racket.getX() - 17);
+                        racket.setX(racket.getX() - 15);
                     }
                 }
                 case RIGHT -> {
                     if (racket.getX() < WINDOW_WIDTH - RACKET_WIDTH) {
-                        racket.setX(racket.getX() + 17);
+                        racket.setX(racket.getX() + 15);
                     }
                 }
             }
@@ -164,13 +192,15 @@ public class PongFXApplication extends Application {
                         ball.getCenterY() + BALL_RADIUS >= RACKET_Y_POSITION
                 ) {
                     ballYVelocity = -ballYVelocity;
+                } else if (ball.getCenterY() > RACKET_Y_POSITION) {
+                    isGameRunning = false;
                 }
 
 
-                    try {
+                try {
                     ball.setCenterX(ball.getCenterX() + ballXVelocity);
                     ball.setCenterY(ball.getCenterY() + ballYVelocity);
-                    Thread.sleep(100);
+                    Thread.sleep(80);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

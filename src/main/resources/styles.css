@@ -1,4 +1,4 @@
-#root {
+#game {
     -fx-background-image: url("frosted-glass.jpg");
     -fx-background-size: stretch;
 }
@@ -24,4 +24,31 @@
     -fx-stroke: #9c3f03;
     -fx-stroke-width: 2;
     -fx-stroke-type: inside;
+}
+
+#menu {
+    -fx-background-image: url("frosted-glass.jpg");
+    -fx-background-size: stretch;
+}
+
+#menu-title {
+    -fx-font-family: 'monospace';
+    -fx-font-weight: bold;
+    -fx-font-size: 48;
+    -fx-text-fill: black;
+    -fx-alignment: center;
+}
+
+#menu-button {
+    -fx-font-family: 'monospace';
+    -fx-font-weight: bold;
+    -fx-font-size: 24;
+    -fx-text-fill: white;
+    -fx-background-image: url("frosted-glass.jpg");
+}
+
+#menu-button:hover {
+    -fx-border-color: #00ffff;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
 }
