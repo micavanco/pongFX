@@ -52,3 +52,9 @@
     -fx-border-width: 1;
     -fx-border-radius: 5;
 }
+
+#counter {
+    -fx-font-family: 'monospace';
+    -fx-font-weight: bold;
+    -fx-font-size: 24;
+}

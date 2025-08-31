@@ -2,12 +2,17 @@ package com.michaelolech.pongfx;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.HPos;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -36,6 +41,9 @@ public class PongFXApplication extends Application {
     private int ballYVelocity = 5;
     private final int THREAD_SLEEP = 30;
     private List<Rectangle> bricks;
+    private int points = 0;
+    private Text counter;
+    private int maxScore;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -62,29 +70,39 @@ public class PongFXApplication extends Application {
     }
 
     private Pane createMainMenu() {
-        double centerX = (double) WINDOW_WIDTH / 2;
-        double centerY = (double) WINDOW_HEIGHT / 2;
-        Pane root = new Pane();
+        FlowPane root = new FlowPane(Orientation.VERTICAL);
         root.setId("menu");
+        root.setAlignment(Pos.CENTER);
+        root.setColumnHalignment(HPos.CENTER);
+        root.setHgap(20);
+        root.setVgap(80);
 
         Text title = new Text("PongFX Main Menu");
         title.setId("menu-title");
-        title.setX(centerX - 230);
-        title.setY(centerY - 120);
 
         Button startGameButton = new Button("Start Game");
         startGameButton.setId("menu-button");
         startGameButton.setMinWidth(240);
         startGameButton.setMaxWidth(240);
-        startGameButton.setLayoutX(centerX - 120);
-        startGameButton.setLayoutY(centerY);
         startGameButton.setOnAction(event -> {
             gameWindow = createGame();
             scene.setRoot(gameWindow);
+            points = 0;
+            counter.setText(String.valueOf(points));
             startGame();
         });
 
-        root.getChildren().addAll(title, startGameButton);
+        if (counter != null) {
+            String finalText = points == maxScore ? "You Won! Congratulations!" : "Game Over!";
+            title.setText(finalText);
+            title.setTextAlignment(TextAlignment.CENTER);
+            Text score = new Text("Score: " + points);
+            score.setId("menu-title");
+
+            root.getChildren().addAll(title, score, startGameButton);
+        } else {
+            root.getChildren().addAll(title, startGameButton);
+        }
 
         return root;
     }
@@ -108,6 +126,17 @@ public class PongFXApplication extends Application {
         createBall(root);
         createRacket(root);
         createBricks(root);
+        createCounter(root);
+    }
+
+    private void createCounter(Pane root) {
+        this.counter = new Text(String.valueOf(points));
+
+        counter.setId("counter");
+        counter.setX(WINDOW_WIDTH - 50);
+        counter.setY(30);
+
+        root.getChildren().add(counter);
     }
 
     private void createBall(Pane root) {
@@ -153,6 +182,8 @@ public class PongFXApplication extends Application {
                 y++;
             }
         }
+
+        maxScore = bricks.size() * 15;
     }
 
     private Rectangle createBrick(double posX, double posY) {
@@ -247,9 +278,19 @@ public class PongFXApplication extends Application {
                 brick.intersects(ball.getBoundsInParent())
             ) {
                 bricks.remove(brick);
-                Platform.runLater(() -> gameWindow.getChildren().remove(brick));
+                Platform.runLater(() -> {
+                    gameWindow.getChildren().remove(brick);
+                    points += 15;
+                    counter.setText(String.valueOf(points));
+                });
                 return true;
             }
+        }
+
+        if (bricks.isEmpty()) {
+            isGameRunning = false;
+            Pane mainManu = createMainMenu();
+            scene.setRoot(mainManu);
         }
 
         return false;
