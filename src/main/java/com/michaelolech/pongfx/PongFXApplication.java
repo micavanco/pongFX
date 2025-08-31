@@ -18,11 +18,16 @@ public class PongFXApplication extends Application {
     private final int BRICK_HEIGHT = 20;
     private final int BRICKS_PADDING = (int) (WINDOW_WIDTH * 0.1);
     private final int BALL_RADIUS = 10;
+    private final int BALL_DIAMETER = BALL_RADIUS * 2;
     private final int RACKET_WIDTH = 100;
+    private final int RACKET_HEIGHT = 10;
+    private final int RACKET_Y_POSITION = WINDOW_HEIGHT - 20 - RACKET_HEIGHT;
     private Circle ball;
     private Rectangle racket;
     private boolean isGameRunning = false;
     private Thread gameThread;
+    private int ballXVelocity = 15;
+    private int ballYVelocity = 15;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -34,8 +39,12 @@ public class PongFXApplication extends Application {
         stage.show();
         stage.setResizable(false);
         stage.centerOnScreen();
+        stage.setOnCloseRequest(event -> {
+            isGameRunning = false;
+        });
 
         addMainWindowEventListener(scene);
+        startGame();
     }
 
     public static void main(String[] args) {
@@ -71,7 +80,7 @@ public class PongFXApplication extends Application {
         ball.setRadius(BALL_RADIUS);
         ball.setId("ball");
         ball.setCenterX((double) WINDOW_WIDTH / 2);
-        ball.setCenterY((double) WINDOW_HEIGHT / 2);
+        ball.setCenterY((double) WINDOW_HEIGHT / 2 - 100);
 
         root.getChildren().add(ball);
     }
@@ -81,7 +90,7 @@ public class PongFXApplication extends Application {
 
         racket.setId("racket");
         racket.setWidth(RACKET_WIDTH);
-        racket.setHeight(10);
+        racket.setHeight(RACKET_HEIGHT);
         racket.setX((double) WINDOW_WIDTH / 2 - racket.getWidth() / 2);
         racket.setY(WINDOW_HEIGHT - 20);
 
@@ -134,5 +143,42 @@ public class PongFXApplication extends Application {
                 }
             }
         });
+    }
+
+    private synchronized void startGame() {
+        isGameRunning = true;
+        gameThread = new  Thread(() -> {
+            while (isGameRunning) {
+                if (
+                        ball.getCenterX() >= WINDOW_WIDTH - BALL_DIAMETER ||
+                        ball.getCenterX() - BALL_DIAMETER < 0
+                ) {
+                    ballXVelocity = -ballXVelocity;
+                } else if (
+                        ball.getCenterY() <= BALL_RADIUS
+                ) {
+                    ballYVelocity = -ballYVelocity;
+                } else if (
+                        ball.getCenterX() >= racket.getX() &&
+                        ball.getCenterX() - BALL_RADIUS < racket.getX() + racket.getWidth() &&
+                        ball.getCenterY() + BALL_RADIUS >= RACKET_Y_POSITION
+                ) {
+                    ballYVelocity = -ballYVelocity;
+                }
+
+
+                    try {
+                    ball.setCenterX(ball.getCenterX() + ballXVelocity);
+                    ball.setCenterY(ball.getCenterY() + ballYVelocity);
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            isGameRunning = false;
+        });
+        gameThread.start();
     }
 }
